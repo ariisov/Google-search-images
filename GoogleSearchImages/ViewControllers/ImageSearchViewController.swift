@@ -38,9 +38,13 @@ class ImageSearchViewController: UIViewController {
         return searchController
     }()
     
+    private lazy var model = Model()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        model.updateDelegate = self
         setupViews()
+        performSearch(query: "Hedgehog")
     }
     
     private func setupViews() {
@@ -56,7 +60,6 @@ class ImageSearchViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        performSearch(query: "Hedgehog")
     }
     
     
@@ -68,23 +71,7 @@ class ImageSearchViewController: UIViewController {
         let urlString = "\(serpapiLink)?q=\(encodedQuery)&tbm=isch&api_key=\(apiKey)"
         guard let url = URL(string: urlString) else { return }
         
-        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            guard let self = self else { return }
-            guard let data = data else { return }
-            guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else { return }
-            guard let images = json["images_results"] as? [[String: Any]] else { return }
-            let urls = images.compactMap { $0["original"] as? String }.compactMap { URL(string: $0) }
-            let links = images.compactMap { $0["link"] as? String }.compactMap { URL(string: $0) }
-            
-            DispatchQueue.main.async {
-                self.searchResults.removeAll()
-                for imageIndex in 0..<urls.count-1 {
-                    self.searchResults.append(Result(imageURL: urls[imageIndex], sourceURL: links[imageIndex]))
-                }
-                self.collectionView.reloadData()
-            }
-        }
-        task.resume()
+        model.createRequest(url: url, Results: searchResults)
     }
     
     // MARK: - Navigation Methods
@@ -95,6 +82,15 @@ class ImageSearchViewController: UIViewController {
         navigationController?.pushViewController(imageViewController, animated: true)
     }
     
+}
+
+extension ImageSearchViewController: CollectionViewUpdateDelegate {
+    
+    func update(result: [Result]) {
+        searchResults = result
+        collectionView.reloadData()
+        return
+    }
 }
 
 // MARK: - UICollectionViewDataSource
