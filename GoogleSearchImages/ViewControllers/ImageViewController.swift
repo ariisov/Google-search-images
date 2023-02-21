@@ -21,7 +21,7 @@ class ImageViewController: UIViewController {
     
     private let imageUrl: URL
     
-    var searchResults: [Result] = []
+    private var searchResults: [Result] = []
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
