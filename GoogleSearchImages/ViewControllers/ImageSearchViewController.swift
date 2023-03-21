@@ -38,11 +38,11 @@ class ImageSearchViewController: UIViewController {
         return searchController
     }()
     
-    private lazy var model = Model()
+    private lazy var router = Router()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        model.updateDelegate = self
+        router.updateDelegate = self
         setupViews()
         performSearch(query: "Hedgehog")
     }
@@ -71,7 +71,7 @@ class ImageSearchViewController: UIViewController {
         let urlString = "\(serpapiLink)?q=\(encodedQuery)&tbm=isch&api_key=\(apiKey)"
         guard let url = URL(string: urlString) else { return }
         
-        model.createRequest(url: url, Results: searchResults)
+        router.createRequest(url: url, Results: searchResults)
     }
     
     // MARK: - Navigation Methods

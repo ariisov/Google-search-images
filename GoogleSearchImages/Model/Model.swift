@@ -11,7 +11,7 @@ protocol CollectionViewUpdateDelegate: AnyObject {
     func update(result: [Result])
 }
 
-class Model {
+class Router {
     
     private var searchResults: [Result] = []
     
